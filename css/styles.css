@@ -1,0 +1,33 @@
+body{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color:rgb(93, 124, 47);
+}
+
+canvas{
+    border: 1px solid;
+    max-height: 90vh;
+    
+
+}
+
+h1{
+    font-family: sans-serif;
+    color:white;
+    font-weight: 100;
+}
+
+button{
+    padding:20px;
+    border-radius: 2px;
+    border-color: transparent;
+    transition: all 0.5s;
+    cursor: pointer;
+}
+
+button:active{
+    background-color: rgb(185, 185, 185);
+}
