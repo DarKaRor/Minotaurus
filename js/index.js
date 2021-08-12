@@ -1,5 +1,6 @@
 import { diceEvent } from "./dice.js";
 //import Board from "./board.js";
+import Tile from "./tile.js";
 
 const btn = document.getElementById("btn");
 const randomBtn = document.getElementById("rnd");
@@ -13,6 +14,7 @@ const GAME_WIDTH = TILES_SIZE * TILES_AMOUNT;
 const GAME_HEIGHT = TILES_SIZE * TILES_AMOUNT;
 
 let thicc = 1;
+let radius = 3.5;
 
 canvas.setAttribute('width', GAME_WIDTH);
 canvas.setAttribute('height', GAME_HEIGHT);
@@ -72,7 +74,6 @@ function ClearCanvas() {
                         else if (y < 3) color = "#F00";
                         else isEmpty = true;
                     }
-
                     else isEmpty = true;
                 }
                 else isEmpty = true;
@@ -95,7 +96,7 @@ function ClearCanvas() {
 
             if (isCircle) {
                 ctx.beginPath();
-                ctx.arc((x * TILES_SIZE) + TILES_SIZE / 2,(y * TILES_SIZE) + TILES_SIZE / 2, TILES_SIZE / 3.5, 0 * Math.PI, 2 * Math.PI);
+                ctx.arc((x * TILES_SIZE) + TILES_SIZE / 2,(y * TILES_SIZE) + TILES_SIZE / 2, TILES_SIZE / radius, 0 * Math.PI, 2 * Math.PI);
                 ctx.stroke();
             }
         }
@@ -118,9 +119,8 @@ function Randomize() {
                 }
                 ctx.fillRect(xPos + thicc, yPos + thicc, TILES_SIZE - (thicc * 2), TILES_SIZE - (thicc * 2));
                 ctx.beginPath();
-                ctx.arc(xPos + TILES_SIZE / 2, yPos + TILES_SIZE / 2, TILES_SIZE / 4, 0 * Math.PI, 2 * Math.PI);
+                ctx.arc(xPos + TILES_SIZE / 2, yPos + TILES_SIZE / 2, TILES_SIZE / radius, 0 * Math.PI, 2 * Math.PI);
                 ctx.stroke();
-
             }
 
         }
