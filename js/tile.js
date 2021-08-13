@@ -59,7 +59,7 @@ Tile.prototype.checkPlayer = function(team)
         case 2: color = "white"; break; // White team
         case 3: color = "yellow"; break; // Yellow team
         case 4: color = "#1d7ce6"; break; // Blue team
-        case 5: color = "#555";break; // Beast
+        case 5: {color = "#555"; this.isBorder=false;break;} // Beast
     }
 
     return color;

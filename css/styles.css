@@ -9,15 +9,20 @@ body{
 
 canvas{
     border: 1px solid;
-    max-height: 90vh;
-    
-
+    width: 70%;
 }
 
-h1{
+#container{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#dice h1{
     font-family: sans-serif;
     color:white;
     font-weight: 100;
+    text-align: center;
 }
 
 button{
@@ -26,8 +31,26 @@ button{
     border-color: transparent;
     transition: all 0.5s;
     cursor: pointer;
+    width:100px;
+    text-align: center;
 }
 
 button:active{
     background-color: rgb(185, 185, 185);
+}
+
+@media screen and (max-width:764px) 
+{
+   #container{
+       flex-direction: column;
+   }
+
+   #canvas{
+       width:100%;
+       max-height: 70vh;
+   }
+
+   button{
+       padding:10px;
+   }
 }
