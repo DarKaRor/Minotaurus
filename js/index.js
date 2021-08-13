@@ -1,5 +1,5 @@
 import { diceEvent } from "./dice.js";
-//import Board from "./board.js";
+import {layout} from "./board.js";
 import Tile from "./tile.js";
 
 const btn = document.getElementById("btn");
@@ -19,89 +19,59 @@ let radius = 3.5;
 canvas.setAttribute('width', GAME_WIDTH);
 canvas.setAttribute('height', GAME_HEIGHT);
 
+
+
+
 // Draw Floor
 
 ClearCanvas();
-
 
 randomBtn.addEventListener('click', function () {
     ClearCanvas();
     Randomize();
 })
 
-function ClearCanvas() {
-    for (let x = 0; x < TILES_AMOUNT; x++) {
-        for (let y = 0; y < TILES_AMOUNT; y++) {
+function ClearCanvas(){
+    for(let x = 0; x< TILES_AMOUNT;x++){
+        for(let y =0;y<TILES_AMOUNT;y++){
 
             let xPos = x * TILES_SIZE;
             let yPos = y * TILES_SIZE;
-            let color = "";
-            let isBorder = false;
-            let isCircle = false;
-            let isEmpty = false;
             let currentSize = TILES_SIZE;
+            if (x == 0 || y == 0 || x == TILES_AMOUNT - 1 || y == TILES_AMOUNT - 1) 
+            {
+                ctx.fillStyle ="#b9fe55";
+                ctx.fillRect(xPos, yPos, currentSize, currentSize);
+            }
 
-            if (x == 0 || y == 0 || x == TILES_AMOUNT - 1 || y == TILES_AMOUNT - 1) color = "#b9fe55";
+            else
+            {
+                let current;
+                
+                if(layout[y-1][x-1].length>=2) current = new Tile(layout[y-1][x-1][0],layout[y-1][x-1][1]);
+                else current= new Tile(layout[y-1][x-1]);
 
-            else {
-                isCircle = true;
-                isBorder = true;
-
-                let half = TILES_AMOUNT / 2;
-
-                if (x >= half - 1 && x <= half && y >= half - 1 && y <= half) color = "#555";
-
-                else if (x >= half - 2 && x <= half + 1 && y >= half - 2 && y <= half + 1) {
-                    if (x < half) {
-                        if (y >= half) color = "#1d7ce6";
-                        else color = "yellow";
-                    }
-                    else {
-                        if (y >= half) color = "white";
-                        else color = "red";
-                    }
+                if (current.isBorder) {
+                    currentSize = currentSize - (thicc * 2)
+                    drawBorder(xPos, yPos, currentSize, currentSize, thicc);
+                    xPos += thicc;
+                    yPos += thicc;
                 }
 
-                else if (x == 1 || y == 1 || x == TILES_AMOUNT - 2 || y == TILES_AMOUNT - 2) {
-                    if (x < 3) {
-                        if (y < 3) color = "#FF0";
-                        else if (y > TILES_AMOUNT - 4) color = "#1d7ce6";
-                        else isEmpty = true;
-                    }
-
-                    else if (x > TILES_AMOUNT - 4) {
-                        if (y > TILES_AMOUNT - 4) color = "#FFF";
-                        else if (y < 3) color = "#F00";
-                        else isEmpty = true;
-                    }
-                    else isEmpty = true;
+                ctx.fillStyle = current.color;
+                ctx.fillRect(xPos, yPos, currentSize, currentSize);
+    
+                if (current.isCircle) {
+                    ctx.beginPath();
+                    ctx.arc((x * TILES_SIZE) + TILES_SIZE / 2,(y * TILES_SIZE) + TILES_SIZE / 2, TILES_SIZE / radius, 0 * Math.PI, 2 * Math.PI);
+                    ctx.stroke();
                 }
-                else isEmpty = true;
-            }
 
-            if (isEmpty) {
-                color = "#10b952";
-                isBorder = false;
-            }
-
-            if (isBorder) {
-                currentSize = currentSize - (thicc * 2)
-                drawBorder(xPos, yPos, currentSize, currentSize, thicc);
-                xPos += thicc;
-                yPos += thicc;
-            }
-
-            ctx.fillStyle = color;
-            ctx.fillRect(xPos, yPos, currentSize, currentSize);
-
-            if (isCircle) {
-                ctx.beginPath();
-                ctx.arc((x * TILES_SIZE) + TILES_SIZE / 2,(y * TILES_SIZE) + TILES_SIZE / 2, TILES_SIZE / radius, 0 * Math.PI, 2 * Math.PI);
-                ctx.stroke();
             }
         }
     }
 }
+
 
 function Randomize() {
     for (let x = 1; x < TILES_AMOUNT - 1; x++) {
