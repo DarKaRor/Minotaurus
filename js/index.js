@@ -13,13 +13,14 @@ const TILES_SIZE = Math.round(canvas.getAttribute('width') / TILES_AMOUNT)
 const GAME_WIDTH = TILES_SIZE * TILES_AMOUNT;
 const GAME_HEIGHT = TILES_SIZE * TILES_AMOUNT;
 
-let thicc = 1;
+let thickness = 1;
 let radius = 3.5;
 
 canvas.setAttribute('width', GAME_WIDTH);
 canvas.setAttribute('height', GAME_HEIGHT);
 
-
+let numLevel = 2;
+let level = layout[numLevel-1];
 
 
 // Draw Floor
@@ -48,14 +49,14 @@ function ClearCanvas(){
             {
                 let current;
                 
-                if(layout[y-1][x-1].length>=2) current = new Tile(layout[y-1][x-1][0],layout[y-1][x-1][1]);
-                else current= new Tile(layout[y-1][x-1]);
+                if(level[y-1][x-1].length>=2) current = new Tile(level[y-1][x-1][0],level[y-1][x-1][1]);
+                else current= new Tile(level[y-1][x-1]);
 
                 if (current.isBorder) {
-                    currentSize = currentSize - (thicc * 2)
-                    drawBorder(xPos, yPos, currentSize, currentSize, thicc);
-                    xPos += thicc;
-                    yPos += thicc;
+                    currentSize = currentSize - (thickness * 2)
+                    drawBorder(xPos, yPos, currentSize, currentSize, thickness);
+                    xPos += thickness;
+                    yPos += thickness;
                 }
 
                 ctx.fillStyle = current.color;
@@ -82,12 +83,12 @@ function Randomize() {
 
             var num = Math.floor(Math.random() * (1 - 10)) + 10;
             if (num <= 2) {
-                drawBorder(xPos, yPos, TILES_SIZE - (thicc * 2), TILES_SIZE - (thicc * 2), thicc)
+                drawBorder(xPos, yPos, TILES_SIZE - (thickness * 2), TILES_SIZE - (thickness * 2), thickness)
                 switch (num) {
                     case 1: ctx.fillStyle = "#b9fe55"; break;
                     case 2: ctx.fillStyle = "#b4c5cd"; break;
                 }
-                ctx.fillRect(xPos + thicc, yPos + thicc, TILES_SIZE - (thicc * 2), TILES_SIZE - (thicc * 2));
+                ctx.fillRect(xPos + thickness, yPos + thickness, TILES_SIZE - (thickness * 2), TILES_SIZE - (thickness * 2));
                 ctx.beginPath();
                 ctx.arc(xPos + TILES_SIZE / 2, yPos + TILES_SIZE / 2, TILES_SIZE / radius, 0 * Math.PI, 2 * Math.PI);
                 ctx.stroke();
