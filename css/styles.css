@@ -1,33 +1,79 @@
-body{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color:rgb(93, 124, 47);
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: rgb(93, 124, 47);
 }
 
-canvas{
-    border: 1px solid;
-    max-height: 90vh;
-    
-
+canvas {
+  border: 1px solid;
+  max-height: 90vh;
 }
 
-h1{
-    font-family: sans-serif;
-    color:white;
-    font-weight: 100;
+h1 {
+  font-family: sans-serif;
+  color: white;
+  font-weight: 100;
 }
 
-button{
-    padding:20px;
-    border-radius: 2px;
-    border-color: transparent;
-    transition: all 0.5s;
-    cursor: pointer;
+button {
+  padding: 20px;
+  border-radius: 2px;
+  border-color: transparent;
+  transition: all 0.5s;
+  cursor: pointer;
 }
 
-button:active{
-    background-color: rgb(185, 185, 185);
+button:active {
+  background-color: rgb(185, 185, 185);
+}
+
+/*Dice Roll Animation*/
+
+.container {
+  width: 150px;
+  padding: 10px;
+  border: 1px solid black;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 15%;
+  left: 12%;
+  background-color: #ffffff;
+  box-shadow: 0 15px 35px rgba(50, 50, 50, 0, 15);
+  border-radius: 8px;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Poppins", sans-serif;
+}
+.dice-wrapper {
+  width: 90%;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+.dice-btn {
+  background-color: #e92e3d;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  padding: 15px 0;
+  width: 150px;
+  letter-spacing: 1px;
+  border-radius: 5px;
+}
+.shake {
+  animation: shake 0.5s infinite;
+}
+@keyframes shake {
+  0% {
+    transform: rotate(8deg);
+  }
+  50% {
+    transform: rotate(-8deg);
+  }
+  100% {
+    transform: rotate(8deg);
+  }
 }
