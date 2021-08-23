@@ -11,12 +11,15 @@
 
 <body>
     <div id="container">
-        <div id="dice">
-            <h1>Dado</h1>
-            <button id="btn">Presioname</button>
-        </div>
         <canvas id="canvas" width=1000 height=1000></canvas>
-        <button id="rnd">Randomize</button>
+    </div>
+
+    <!--Dice Element-->
+    <div class="container">
+        <div class="dice-wrapper">
+            <img class="dice-btn-img" id="die1" src="./img/dice-troll-face.png" width="100px" height="100px">
+        </div>
+        <button id="dice" class="dice-btn">Roll Dice</button>
     </div>
     <script type="module" src="./js/index.js"></script>
 </body>
