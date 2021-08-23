@@ -1,6 +1,7 @@
-import {roll} from "./dice.js"
+import { roll } from "./dice.js"
 import { layout } from "./board.js";
 import Tile from "./tile.js";
+import Player from "./player.js";
 
 
 
@@ -22,82 +23,96 @@ canvas.setAttribute('height', GAME_HEIGHT);
 let numLevel = 1;
 let level = layout[numLevel - 1];
 
-let posX = 1;
-let posY = 1;
+let testPlayer = new Player(3);
+testPlayer.posX = 2;
+testPlayer.posY = 2;
+
 
 // Draw Floor
 ClearCanvas();
-DrawPlayer();
+DrawPlayer(testPlayer);
+
 
 
 // Inputs
 
 document.addEventListener('keydown', (event) => {
     const keyName = event.key;
-
+    let posX = testPlayer.posX;
+    let posY = testPlayer.posY;
     ClearCanvas();
 
     // Optimize
     switch (keyName) {
         case "ArrowDown":
             {
-                if (CanPlace(posX,posY+1)) {
+                if (CanPlace(posX, posY + 1, testPlayer)) {
                     posY++;
                 }
                 break;
             }
         case "ArrowUp":
             {
-                if (CanPlace(posX,posY-1)) {
+                if (CanPlace(posX, posY - 1, testPlayer)) {
                     posY--;
                 }
                 break;
             };
         case "ArrowRight":
             {
-                if (CanPlace(posX+1,posY)) {
+                if (CanPlace(posX + 1, posY, testPlayer)) {
                     posX++;
                 }
                 break;
             };
         case "ArrowLeft":
             {
-                if (CanPlace(posX-1,posY)) {
+                if (CanPlace(posX - 1, posY, testPlayer)) {
                     posX--;
                 }
                 break;
             }
     }
 
-    
-    DrawPlayer();
+    testPlayer.posX = posX;
+    testPlayer.posY = posY;
+
+
+    DrawPlayer(testPlayer);
 })
 
 function GetTile(posX, posY) {
-    if(level[posY-1]!=undefined){
-    if(level[posY-1][posX-1]!=undefined) 
-    return new Tile(level[posY - 1][posX - 1]);}
+    if (level[posY - 1] != undefined) {
+        if (level[posY - 1][posX - 1] != undefined) {
+            let value = level[posY - 1][posX - 1];
+            if (value.length >= 2) return new Tile(value[0], value[1]);
+            else return new Tile(value);
+        };
+    }
     return null;
 }
 
-function CanPlace(posX, posY, value) {
-    let tile = GetTile(posX,posY);
-    if(tile)
-    {
-        if(tile.isCollider) return false;
+function CanPlace(posX, posY, player) {
+    let tile = GetTile(posX, posY);
+    console.log(tile);
+    if (tile) {
+        if (tile.isCollider) return false;
+        if ((tile.isSpawn || tile.isGoal) && tile.team!=player.team) return false;
         return true;
     }
     return false;
 }
 
-function DrawPlayer() {
-    let color = "black";
+function DrawPlayer(player) {
+    let color = player.color;
+    let posX = player.posX;
+    let posY = player.posY;
     ctx.beginPath();
     ctx.arc((posX * TILES_SIZE) + TILES_SIZE / 2, (posY * TILES_SIZE) + TILES_SIZE / 2, TILES_SIZE / 2.1, 0 * Math.PI, 2 * Math.PI);
     ctx.fillStyle = "black";
     ctx.fill();
     ctx.arc((posX * TILES_SIZE) + TILES_SIZE / 2, (posY * TILES_SIZE) + TILES_SIZE / 2, TILES_SIZE / 2.1, 0 * Math.PI, 2 * Math.PI);
-    ctx.fillStyle = "yellow";
+    ctx.fillStyle = player.color;
     ctx.fill();
     ctx.stroke();
 }
