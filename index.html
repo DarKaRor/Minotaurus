@@ -15,12 +15,37 @@
     </div>
 
     <!--Dice Element-->
-    <div class="container">
-        <div class="dice-wrapper">
-            <img class="dice-btn-img" id="die1" src="./img/dice-troll-face.png" width="100px" height="100px">
-        </div>
-        <button id="dice" class="dice-btn">Roll Dice</button>
+    <div class="dice-display">
+
+        <button class="dice-display-btn1">Change Dice Display</button>
+        <button class="dice-display-btn2">Change Dice Display</button>
+
     </div>
+    <div class="dice-containers">
+
+        <div class="d2-dice-container">
+            <div class="dice-wrapper">
+                <img class="dice-btn-img" id="die1" src="./img/dice-troll-face.png" width="100px" height="100px">
+            </div>
+            <button id="dice" class="dice-btn">Roll Dice</button>
+        </div>
+        <div class="d3-dice-container">
+            <div class = "scene">
+                <div class="cube">
+                    <div class="cube__face cube__face--1"><img class="d3-img" src="./img/dice-troll-face.png"></div>
+                    <div class="cube__face cube__face--2"><img class="d3-img" src="./img/dice-wall-face.jpg"></div>
+                    <div class="cube__face cube__face--3"><img class="d3-img" src="./img/dice-f-3.svg"></div>
+                    <div class="cube__face cube__face--4"><img class="d3-img" src="./img/dice-f-4.svg"></div>
+                    <div class="cube__face cube__face--5"><img class="d3-img" src="./img/dice-f-5.svg"></div>
+                    <div class="cube__face cube__face--6"><img class="d3-img" src="./img/dice-f-6.svg"></div>
+                </div>
+                
+                <button class = "rollBtn" onclick="">Roll the Dice</button>
+            </div>
+        </div>
+
+    </div>
+    
     <script type="module" src="./js/index.js"></script>
 </body>
 

@@ -23,7 +23,7 @@ canvas.setAttribute('height', GAME_HEIGHT);
 let numLevel = 1;
 let level = layout[numLevel - 1];
 
-let testPlayer = new Player(3);
+let testPlayer = new Player(2);
 testPlayer.posX = 2;
 testPlayer.posY = 2;
 
