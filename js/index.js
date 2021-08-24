@@ -1,8 +1,10 @@
-import { diceEvent } from "./dice.js";
-//import Board from "./board.js";
+import { roll } from "./dice.js"
+import { layout } from "./board.js";
+import Tile from "./tile.js";
+import Player from "./player.js";
 
-const btn = document.getElementById("btn");
-const randomBtn = document.getElementById("rnd");
+
+
 const canvas = document.getElementById("canvas");
 
 let ctx = canvas.getContext('2d');
@@ -12,20 +14,108 @@ const TILES_SIZE = Math.round(canvas.getAttribute('width') / TILES_AMOUNT)
 const GAME_WIDTH = TILES_SIZE * TILES_AMOUNT;
 const GAME_HEIGHT = TILES_SIZE * TILES_AMOUNT;
 
-let thicc = 1;
+let thickness = 1;
+let radius = 3.5;
 
 canvas.setAttribute('width', GAME_WIDTH);
 canvas.setAttribute('height', GAME_HEIGHT);
 
+let numLevel = 1;
+let level = layout[numLevel - 1];
+
+let testPlayer = new Player(3);
+testPlayer.posX = 2;
+testPlayer.posY = 2;
+
+
 // Draw Floor
-
 ClearCanvas();
+DrawPlayer(testPlayer);
 
 
-randomBtn.addEventListener('click', function () {
+
+// Inputs
+
+document.addEventListener('keydown', (event) => {
+    const keyName = event.key;
+    let posX = testPlayer.posX;
+    let posY = testPlayer.posY;
     ClearCanvas();
-    Randomize();
+
+    // Optimize
+    switch (keyName) {
+        case "ArrowDown":
+            {
+                if (CanPlace(posX, posY + 1, testPlayer)) {
+                    posY++;
+                }
+                break;
+            }
+        case "ArrowUp":
+            {
+                if (CanPlace(posX, posY - 1, testPlayer)) {
+                    posY--;
+                }
+                break;
+            };
+        case "ArrowRight":
+            {
+                if (CanPlace(posX + 1, posY, testPlayer)) {
+                    posX++;
+                }
+                break;
+            };
+        case "ArrowLeft":
+            {
+                if (CanPlace(posX - 1, posY, testPlayer)) {
+                    posX--;
+                }
+                break;
+            }
+    }
+
+    testPlayer.posX = posX;
+    testPlayer.posY = posY;
+
+
+    DrawPlayer(testPlayer);
 })
+
+function GetTile(posX, posY) {
+    if (level[posY - 1] != undefined) {
+        if (level[posY - 1][posX - 1] != undefined) {
+            let value = level[posY - 1][posX - 1];
+            if (value.length >= 2) return new Tile(value[0], value[1]);
+            else return new Tile(value);
+        };
+    }
+    return null;
+}
+
+function CanPlace(posX, posY, player) {
+    let tile = GetTile(posX, posY);
+    console.log(tile);
+    if (tile) {
+        if (tile.isCollider) return false;
+        if ((tile.isSpawn || tile.isGoal) && tile.team!=player.team) return false;
+        return true;
+    }
+    return false;
+}
+
+function DrawPlayer(player) {
+    let color = player.color;
+    let posX = player.posX;
+    let posY = player.posY;
+    ctx.beginPath();
+    ctx.arc((posX * TILES_SIZE) + TILES_SIZE / 2, (posY * TILES_SIZE) + TILES_SIZE / 2, TILES_SIZE / 2.1, 0 * Math.PI, 2 * Math.PI);
+    ctx.fillStyle = "black";
+    ctx.fill();
+    ctx.arc((posX * TILES_SIZE) + TILES_SIZE / 2, (posY * TILES_SIZE) + TILES_SIZE / 2, TILES_SIZE / 2.1, 0 * Math.PI, 2 * Math.PI);
+    ctx.fillStyle = player.color;
+    ctx.fill();
+    ctx.stroke();
+}
 
 function ClearCanvas() {
     for (let x = 0; x < TILES_AMOUNT; x++) {
@@ -33,103 +123,45 @@ function ClearCanvas() {
 
             let xPos = x * TILES_SIZE;
             let yPos = y * TILES_SIZE;
-            let color = "";
-            let isBorder = false;
-            let isCircle = false;
-            let isEmpty = false;
             let currentSize = TILES_SIZE;
 
-            if (x == 0 || y == 0 || x == TILES_AMOUNT - 1 || y == TILES_AMOUNT - 1) color = "#b9fe55";
+
+            if (x == 0 || y == 0 || x == TILES_AMOUNT - 1 || y == TILES_AMOUNT - 1) {
+                ctx.fillStyle = "#b9fe55";
+                ctx.fillRect(xPos, yPos, currentSize, currentSize);
+            }
 
             else {
-                isCircle = true;
-                isBorder = true;
+                let current;
+                let value = level[y - 1][x - 1];
 
-                let half = TILES_AMOUNT / 2;
+                if (value.length >= 2) current = new Tile(value[0], value[1]);
+                else current = new Tile(value);
 
-                if (x >= half - 1 && x <= half && y >= half - 1 && y <= half) color = "#555";
-
-                else if (x >= half - 2 && x <= half + 1 && y >= half - 2 && y <= half + 1) {
-                    if (x < half) {
-                        if (y >= half) color = "#1d7ce6";
-                        else color = "yellow";
-                    }
-                    else {
-                        if (y >= half) color = "white";
-                        else color = "red";
-                    }
+                if (current.isBorder) {
+                    currentSize = currentSize - (thickness * 2)
+                    drawBorder(xPos, yPos, currentSize, currentSize, thickness);
+                    xPos += thickness;
+                    yPos += thickness;
                 }
 
-                else if (x == 1 || y == 1 || x == TILES_AMOUNT - 2 || y == TILES_AMOUNT - 2) {
-                    if (x < 3) {
-                        if (y < 3) color = "#FF0";
-                        else if (y > TILES_AMOUNT - 4) color = "#1d7ce6";
-                        else isEmpty = true;
-                    }
+                ctx.fillStyle = current.color;
+                ctx.fillRect(xPos, yPos, currentSize, currentSize);
 
-                    else if (x > TILES_AMOUNT - 4) {
-                        if (y > TILES_AMOUNT - 4) color = "#FFF";
-                        else if (y < 3) color = "#F00";
-                        else isEmpty = true;
-                    }
-
-                    else isEmpty = true;
+                if (current.isCircle) {
+                    ctx.beginPath();
+                    ctx.arc((x * TILES_SIZE) + TILES_SIZE / 2, (y * TILES_SIZE) + TILES_SIZE / 2, TILES_SIZE / radius, 0 * Math.PI, 2 * Math.PI);
+                    ctx.stroke();
                 }
-                else isEmpty = true;
-            }
 
-            if (isEmpty) {
-                color = "#10b952";
-                isBorder = false;
-            }
-
-            if (isBorder) {
-                currentSize = currentSize - (thicc * 2)
-                drawBorder(xPos, yPos, currentSize, currentSize, thicc);
-                xPos += thicc;
-                yPos += thicc;
-            }
-
-            ctx.fillStyle = color;
-            ctx.fillRect(xPos, yPos, currentSize, currentSize);
-
-            if (isCircle) {
-                ctx.beginPath();
-                ctx.arc((x * TILES_SIZE) + TILES_SIZE / 2,(y * TILES_SIZE) + TILES_SIZE / 2, TILES_SIZE / 3.5, 0 * Math.PI, 2 * Math.PI);
-                ctx.stroke();
             }
         }
     }
 }
 
-function Randomize() {
-    for (let x = 1; x < TILES_AMOUNT - 1; x++) {
-        for (let y = 1; y < TILES_AMOUNT - 1; y++) {
-
-            let xPos = x * TILES_SIZE;
-            let yPos = y * TILES_SIZE;
-
-            var num = Math.floor(Math.random() * (1 - 10)) + 10;
-            if (num <= 2) {
-                drawBorder(xPos, yPos, TILES_SIZE - (thicc * 2), TILES_SIZE - (thicc * 2), thicc)
-                switch (num) {
-                    case 1: ctx.fillStyle = "#b9fe55"; break;
-                    case 2: ctx.fillStyle = "#b4c5cd"; break;
-                }
-                ctx.fillRect(xPos + thicc, yPos + thicc, TILES_SIZE - (thicc * 2), TILES_SIZE - (thicc * 2));
-                ctx.beginPath();
-                ctx.arc(xPos + TILES_SIZE / 2, yPos + TILES_SIZE / 2, TILES_SIZE / 4, 0 * Math.PI, 2 * Math.PI);
-                ctx.stroke();
-
-            }
-
-        }
-    }
-}
 
 function drawBorder(xPos, yPos, width, height, thickness) {
     ctx.fillStyle = '#000';
     ctx.fillRect(xPos, yPos, width + (thickness * 2), height + (thickness * 2));
 }
 
-diceEvent(btn);
