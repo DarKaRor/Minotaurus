@@ -1,3 +1,9 @@
+*{
+  margin:0px;
+  padding:0px;
+  box-sizing: border-box;
+}
+
 body {
   display: flex;
   flex-direction: column;
@@ -50,7 +56,7 @@ button:active {
 .d2-dice-container {
   width: 150px;
   height: 170px;
-  padding: 10px;
+  padding: 3px;
   background-color: #ffffff;
   box-shadow: 0 15px 35px rgba(50, 50, 50, 0, 15);
   border-radius: 8px;
@@ -70,8 +76,8 @@ button:active {
   border: none;
   outline: none;
   color: #ffffff;
-  padding: 15px 0;
-  width: 150px;
+  padding: 8px 0;
+  width: 100%;
   letter-spacing: 1px;
   border-radius: 5px;
 }
@@ -80,13 +86,13 @@ button:active {
 }
 @keyframes shake {
   0% {
-    transform: rotate(8deg);
+    transform: rotateZ(8deg);
   }
   50% {
-    transform: rotate(-8deg);
+    transform: rotateZ(-8deg);
   }
   100% {
-    transform: rotate(8deg);
+    transform: rotateZ(8deg);
   }
 }
 
@@ -113,6 +119,7 @@ button:active {
   box-sizing: border-box;
   justify-content: center;
   display: flex;
+  transform:scale(100%);
 }
 
 .rollBtn {
@@ -230,27 +237,28 @@ label {
   padding: 15px;
 }
 
-.dice-display-btn1 {
+.dice-display-btn,.dice-display-btn:active {
   padding: 5px;
   background-color: palegreen;
   color: black;
 }
-.dice-display-btn2 {
-  display: none;
-  padding: 5px;
-  background-color: palegreen;
-  color: black;
-}
-.dice-display-btn1:hover {
-  background-color: black;
-  color: palegreen;
-}
-.dice-display-btn2:hover {
+
+
+.dice-display-btn:hover {
   background-color: black;
   color: palegreen;
 }
 
+
 .d3-dice-container {
   display: none;
   animation: fadeDie 0.7s 1;
+}
+
+.show{
+  display:block;
+}
+
+.hide{
+  display:none;
 }
