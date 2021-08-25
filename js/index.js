@@ -61,74 +61,61 @@ console.log(players);
 document.addEventListener('keydown', (event) => {
 
     const keyName = event.key;
-    console.log(keyName);
-    let posX = players[currentTeam][currentChar].posX;
-    let posY = players[currentTeam][currentChar].posY;
-    ClearCanvas();
+    let currentPlayer = players[currentTeam][currentChar];
+    let shouldDraw = false;
 
 
     // Optimize
     switch (keyName) {
         case "ArrowDown":
-            {
-                event.preventDefault();
-                if (CanPlace(posX, posY + 1, players[currentTeam][currentChar])) {
-                    posY++;
-                }
-                break;
-            }
-        case "ArrowUp":
-            {
-                event.preventDefault();
-                if (CanPlace(posX, posY - 1, players[currentTeam][currentChar])) {
-                    posY--;
-                }
-                break;
-            };
-        case "ArrowRight":
-            {
-                event.preventDefault();
-                if (CanPlace(posX + 1, posY, players[currentTeam][currentChar])) {
-                    posX++;
-                }
-                break;
-            };
-        case "ArrowLeft":
-            {
-                if (!players[currentTeam][currentChar].isWinner) {
-                    event.preventDefault();
-                    if (CanPlace(posX - 1, posY, players[currentTeam][currentChar])) {
-                        posX--;
-                    }
-                }
-                break;
-            }
-        case "q":
-            {
-                if (currentChar < 3) currentChar++;
-                else currentChar = 1;
-                posX = players[currentTeam][currentChar].posX;
-                posY = players[currentTeam][currentChar].posY;
-            }
+            shouldDraw = MoveTo(0, 1, currentPlayer, event);
             break;
-        case "e": {
+
+        case "ArrowUp":
+            shouldDraw = MoveTo(0, -1, currentPlayer, event);
+            break;
+
+        case "ArrowRight":
+            shouldDraw = MoveTo(1, 0, currentPlayer, event);
+            break;
+
+        case "ArrowLeft":
+            shouldDraw = MoveTo(-1, 0, currentPlayer, event);
+            break;
+
+        case "q":
+            if (currentChar < 3) currentChar++;
+            else currentChar = 1;
+            break;
+        case "e":
             if (currentTeam < 4) currentTeam++;
             else currentTeam = 1;
-            posX = players[currentTeam][currentChar].posX;
-            posY = players[currentTeam][currentChar].posY;
-        }
             break;
     }
 
-    players[currentTeam][currentChar].posX = posX;
-    players[currentTeam][currentChar].posY = posY;
 
-    for (let i = 1; i < players.length; i++) {
-        for (let j = 1; j < players[i].length; j++) {
-            DrawPlayer(players[i][j]);
+    players[currentTeam][currentPlayer] = currentPlayer;
+
+    if (shouldDraw) {
+        ClearCanvas();
+        for (let i = 1; i < players.length; i++) {
+            for (let j = 1; j < players[i].length; j++) {
+                DrawPlayer(players[i][j]);
+            }
         }
     }
 })
+
+function MoveTo(x, y, player, event) {
+    event.preventDefault;
+    if (player.isWinner) return false;
+    if (CanPlace(player.posX + x, player.posY + y, player)) {
+        player.posX += x;
+        player.posY += y;
+        return true;
+    }
+    return false;
+}
 
 function GetTile(posX, posY) {
     if (level[posY - 1] != undefined) {
@@ -145,12 +132,13 @@ function CanPlace(posX, posY, player) {
 
     let tile = GetTile(posX, posY);
 
-    console.log(tile);
+    //console.log(tile);
+
     if (tile) {
         if (tile.isCollider) return false;
         if ((tile.isSpawn || tile.isGoal) && tile.team != player.team) return false;
         // delete
-        if(tile.isGoal){player.isWinner = true;}
+        if (tile.isGoal) { player.isWinner = true; }
         return true;
     }
     return false;
@@ -177,7 +165,6 @@ function ClearCanvas() {
             let yPos = y * TILES_SIZE;
             let currentSize = TILES_SIZE;
 
-
             if (x == 0 || y == 0 || x == TILES_AMOUNT - 1 || y == TILES_AMOUNT - 1) {
                 ctx.fillStyle = "#b9fe55";
                 ctx.fillRect(xPos, yPos, currentSize, currentSize);
@@ -191,6 +178,7 @@ function ClearCanvas() {
                 if (value.length >= 2) current = new Tile(value[0], value[1]);
                 else current = new Tile(value);
 
+                // Getting the amount of spawners in the level. Should be Equal for all.
                 if (current.isSpawn && current.team != 5) spawnerCount++;
 
                 if (current.isBorder) {
