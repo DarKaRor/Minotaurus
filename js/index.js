@@ -21,6 +21,7 @@ let radius = 3.5;
 let spawnerCount = 0;
 
 
+
 canvas.setAttribute('width', GAME_WIDTH);
 canvas.setAttribute('height', GAME_HEIGHT);
 
@@ -32,37 +33,34 @@ let currentTeam = 0;
 let currentChar = 0;
 
 let goals = [];
+let spawns = [];
 
 // Draw Floor
 ClearCanvas();
 
+let teams = spawnerCount / 3;
+let chars = spawnerCount /  4;
 
 // CreatePlayers
-for (let i = 0; i < spawnerCount / 3; i++) {
+for (let i = 0; i < teams; i++) {
     if (!players[i]) players[i] = [];
-
     if (!goals[i]) goals[i] = [];
-    let counter = 0;
+    if(!spawns[i]) spawns[i] = [];
 
-    for (let j = 0; j < spawnerCount / 4; j++) {
+    for (let j = 0; j < chars; j++) {
         if (!players[i][j]) players[i][j] = [];
         let current = new Player(i + 1);
-        current.posX = 2 + counter + counterCounter;
-        current.posY = 2;
         players[i][j] = current;
-        if (j == (spawnerCount / 4) - 1) counterCounter = 2 + counter + counterCounter;
-        counter++;
-        DrawPlayer(current);
     }
 }
-
-
 GetData();
 
-console.log(players);
-
-
-
+for(let i = 0;i<teams;i++){
+    for(let j = 0;j<chars;j++){
+        PlaceHouse(players[i][j],spawns);
+        DrawPlayer(players[i][j]);
+    }
+}
 
 // Inputs
 
@@ -116,7 +114,7 @@ document.addEventListener('keydown', (event) => {
 
 function MoveTo(x, y, player, event) {
     event.preventDefault;
-
+    if(player.isWinner) return false;
     if (CanPlace(player.posX + x, player.posY + y, player)) {
         if(!player.isWinner)
         {player.posX += x;
@@ -140,7 +138,6 @@ function GetTile(posX, posY) {
 function CanPlace(posX, posY, player) {
 
     let tile = GetTile(posX, posY);
-
     //console.log(tile);
 
     if (tile) {
@@ -148,9 +145,7 @@ function CanPlace(posX, posY, player) {
         if ((tile.isSpawn || tile.isGoal) && tile.team != player.team) return false;
         // delete
         if (tile.isGoal) {
-            console.log(player.posX);
-            player = PlaceHouse(player);
-            console.log(player.posX);
+            PlaceHouse(player,goals);
             player.isWinner = true; 
          }
         return true;
@@ -185,38 +180,37 @@ function GetData() {
             if (value.length >= 2) current = new Tile(value[0], value[1]);
             else current = new Tile(value);
 
-            if (current.isGoal) {
-                let goal = new Goal(current.team);
-                goal.posX = x;
-                goal.posY = y;
-                goals[current.team - 1].push(goal);
+            if (current.isGoal || current.isSpawn  && current.team!=5) 
+            {
+                let house = new Goal(current.team);
+                house.posX = x;
+                house.posY = y;
 
+                if(current.isGoal) goals[current.team-1].push(house);
+                else spawns[current.team-1].push(house);
             }
         }
     }
 }
 
-function PlaceHouse(player) {
+function PlaceHouse(player,houses) {
     let index = -1;
-    for (let i = 0; i < goals.length; i++) {
-        if (goals[i][0].team == player.team) {
+
+    for (let i = 0; i < houses.length; i++) {
+        if (houses[i][0].team == player.team) {
             index = i;
             break;
         }
     }
 
-    for (let i = 0; i < goals[index].length; i++) {
-        let goal = goals[index][i];
-        console.log(goal);
-        if (!goal.isOccupied) {
-            goal.isOccupied = true;
-            player.posX = goal.posX;
-            player.posY = goal.posY;
+    for (let i = 0; i < houses[index].length; i++) {
+        if (!houses[index][i].isOccupied) {
+            houses[index][i].isOccupied = true;
+            player.posX = houses[index][i].posX;
+            player.posY = houses[index][i].posY;
             break;
         }
     }
-
-    return player;
 }
 
 function ClearCanvas() {
@@ -262,6 +256,7 @@ function ClearCanvas() {
 }
 
 console.log(goals);
+console.log(spawns);
 
 function drawBorder(xPos, yPos, width, height, thickness) {
     ctx.fillStyle = '#000';
