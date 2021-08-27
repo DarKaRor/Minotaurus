@@ -2,6 +2,7 @@ import { roll } from "./dice.js"
 import { layout } from "./board.js";
 import Tile from "./tile.js";
 import Player from "./player.js";
+import Goal from "./goals.js";
 
 
 
@@ -27,29 +28,36 @@ let numLevel = 1;
 let level = layout[numLevel - 1];
 let players = [];
 let counterCounter = 0;
-let currentTeam = 1;
-let currentChar = 1;
+let currentTeam = 0;
+let currentChar = 0;
+
+let goals = [];
 
 // Draw Floor
-
 ClearCanvas();
 
+
 // CreatePlayers
-for (let i = 1; i <= spawnerCount / 3; i++) {
+for (let i = 0; i < spawnerCount / 3; i++) {
     if (!players[i]) players[i] = [];
+
+    if (!goals[i]) goals[i] = [];
     let counter = 0;
 
-    for (let j = 1; j <= spawnerCount / 4; j++) {
+    for (let j = 0; j < spawnerCount / 4; j++) {
         if (!players[i][j]) players[i][j] = [];
-        let current = new Player(i);
+        let current = new Player(i + 1);
         current.posX = 2 + counter + counterCounter;
         current.posY = 2;
         players[i][j] = current;
-        if (j == spawnerCount / 4) counterCounter = 2 + counter + counterCounter;
+        if (j == (spawnerCount / 4) - 1) counterCounter = 2 + counter + counterCounter;
         counter++;
         DrawPlayer(current);
     }
 }
+
+
+GetData();
 
 console.log(players);
 
@@ -84,12 +92,12 @@ document.addEventListener('keydown', (event) => {
             break;
 
         case "q":
-            if (currentChar < 3) currentChar++;
-            else currentChar = 1;
+            if (currentChar < 2) currentChar++;
+            else currentChar = 0;
             break;
         case "e":
-            if (currentTeam < 4) currentTeam++;
-            else currentTeam = 1;
+            if (currentTeam < 3) currentTeam++;
+            else currentTeam = 0;
             break;
     }
 
@@ -98,8 +106,8 @@ document.addEventListener('keydown', (event) => {
 
     if (shouldDraw) {
         ClearCanvas();
-        for (let i = 1; i < players.length; i++) {
-            for (let j = 1; j < players[i].length; j++) {
+        for (let i = 0; i < players.length; i++) {
+            for (let j = 0; j < players[i].length; j++) {
                 DrawPlayer(players[i][j]);
             }
         }
@@ -108,10 +116,11 @@ document.addEventListener('keydown', (event) => {
 
 function MoveTo(x, y, player, event) {
     event.preventDefault;
-    if (player.isWinner) return false;
+
     if (CanPlace(player.posX + x, player.posY + y, player)) {
-        player.posX += x;
-        player.posY += y;
+        if(!player.isWinner)
+        {player.posX += x;
+        player.posY += y;}
         return true;
     }
     return false;
@@ -138,23 +147,76 @@ function CanPlace(posX, posY, player) {
         if (tile.isCollider) return false;
         if ((tile.isSpawn || tile.isGoal) && tile.team != player.team) return false;
         // delete
-        if (tile.isGoal) { player.isWinner = true; }
+        if (tile.isGoal) {
+            console.log(player.posX);
+            player = PlaceHouse(player);
+            console.log(player.posX);
+            player.isWinner = true; 
+         }
         return true;
     }
     return false;
 }
 
+
 function DrawPlayer(player) {
     let posX = player.posX;
     let posY = player.posY;
+    DrawCircle(posX, posY, player.color, TILES_SIZE, 2.1);
+
+}
+
+function DrawCircle(posX, posY, color = "", size, radius) {
     ctx.beginPath();
-    ctx.arc((posX * TILES_SIZE) + TILES_SIZE / 2, (posY * TILES_SIZE) + TILES_SIZE / 2, TILES_SIZE / 2.1, 0 * Math.PI, 2 * Math.PI);
-    ctx.fillStyle = "black";
-    ctx.fill();
-    ctx.arc((posX * TILES_SIZE) + TILES_SIZE / 2, (posY * TILES_SIZE) + TILES_SIZE / 2, TILES_SIZE / 2.1, 0 * Math.PI, 2 * Math.PI);
-    ctx.fillStyle = player.color;
-    ctx.fill();
+    ctx.arc((posX * size) + size / 2, (posY * size) + size / 2, size / radius, 0 * Math.PI, 2 * Math.PI);
+    if (color) {
+        ctx.fillStyle = color;
+        ctx.fill();
+    }
     ctx.stroke();
+}
+
+function GetData() {
+    for (let x = 1; x < TILES_AMOUNT - 1; x++) {
+        for (let y = 1; y < TILES_AMOUNT - 1; y++) {
+            let current;
+            let value = level[y - 1][x - 1];
+
+            if (value.length >= 2) current = new Tile(value[0], value[1]);
+            else current = new Tile(value);
+
+            if (current.isGoal) {
+                let goal = new Goal(current.team);
+                goal.posX = x;
+                goal.posY = y;
+                goals[current.team - 1].push(goal);
+
+            }
+        }
+    }
+}
+
+function PlaceHouse(player) {
+    let index = -1;
+    for (let i = 0; i < goals.length; i++) {
+        if (goals[i][0].team == player.team) {
+            index = i;
+            break;
+        }
+    }
+
+    for (let i = 0; i < goals[index].length; i++) {
+        let goal = goals[index][i];
+        console.log(goal);
+        if (!goal.isOccupied) {
+            goal.isOccupied = true;
+            player.posX = goal.posX;
+            player.posY = goal.posY;
+            break;
+        }
+    }
+
+    return player;
 }
 
 function ClearCanvas() {
@@ -192,16 +254,14 @@ function ClearCanvas() {
                 ctx.fillRect(xPos, yPos, currentSize, currentSize);
 
                 if (current.isCircle) {
-                    ctx.beginPath();
-                    ctx.arc((x * TILES_SIZE) + TILES_SIZE / 2, (y * TILES_SIZE) + TILES_SIZE / 2, TILES_SIZE / radius, 0 * Math.PI, 2 * Math.PI);
-                    ctx.stroke();
+                    DrawCircle(x, y, "", TILES_SIZE, radius);
                 }
-
             }
         }
     }
 }
 
+console.log(goals);
 
 function drawBorder(xPos, yPos, width, height, thickness) {
     ctx.fillStyle = '#000';
